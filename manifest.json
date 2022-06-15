@@ -5,5 +5,13 @@
   "background": {
     "service_worker": "background.js"
   },
-  "action": {}
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "nemria.png",
+      "32": "nemria.png",
+      "48": "nemria.png",
+      "128": "nemria.png"
+    }
+  }
 }
