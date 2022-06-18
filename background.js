@@ -26,3 +26,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     );
   }
 });
+
+chrome.runtime.onMessage.addListener(function (request, sender) {
+  console.log(sender.tab.id);
+  console.log(request);
+  chrome.tabs.update(sender.tab.id, { url: request.redirect });
+});
