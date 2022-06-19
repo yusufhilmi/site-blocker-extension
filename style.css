@@ -10,8 +10,22 @@ body {
 }
 
 h2 {
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin: 1rem 0 0.25rem 0;
+}
+
+button {
+  padding: 4px 8px;
+  color: #383939;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: all 200ms ease-in-out;
+}
+
+button:hover {
+  background-color: #c6c6c6;
+  color: #1f1f1f;
 }
 
 .todo {
