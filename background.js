@@ -15,6 +15,15 @@ chrome.runtime.onInstalled.addListener(async () => {
   chrome.storage.sync.set({ domains }, () => {
     console.log("domains below are blocked", domains);
   });
+
+  const defaultHabit = {
+    title: "Read Book for 30 min",
+    completed: false,
+  };
+
+  chrome.storage.sync.set({ habits: [defaultHabit] }, () => {
+    console.log("default habit added", defaultHabit);
+  });
 });
 
 // a helper to track storage changes
@@ -24,6 +33,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
       `Storage key "${key}" in namespace "${namespace}" changed.`,
       `Old value was "${oldValue}", new value is "${newValue}".`
     );
+    console.log("Old value:", oldValue);
+    console.log("New value:", newValue);
   }
 });
 
