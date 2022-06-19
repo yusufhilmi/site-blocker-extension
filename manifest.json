@@ -8,10 +8,11 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "run_at": "document_start",
       "js": ["content.js"]
     }
   ],
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
