@@ -16,6 +16,11 @@ const handleEditHabit = (el) => {
     const habitId = Number(e.target.getAttribute("data-for").substring(5));
     const habit = habits.find((habit) => habit.id === habitId);
     habit.title = e.target.textContent;
+    // if (e.target.textContent === "") {
+    //   const habitIndex = habits.findIndex((habit) => habit.id === habitId);
+    //   habits.slice(habitIndex, 1);
+    //   el.parentElement.remove();
+    // }
 
     // sync storage
     // chrome.storage.sync.set({ habits: habits });
@@ -24,6 +29,8 @@ const handleEditHabit = (el) => {
 
 const handleEditDomain = (el, id) => {
   el.addEventListener("blur", (e) => {
+    // if (e.target.textContent === "") el.remove();
+
     const domain = domains.find((domain) => domain.id === id);
 
     domain.host = e.target.textContent;
@@ -86,7 +93,7 @@ window.addEventListener("DOMContentLoaded", () => {
       habit.completed ? "checked" : ""
     } /> <span contenteditable="true" data-for="habit${habit.id}">${
       habit.title
-    }</span> <span data-for="habit${habit.id}">X</span>`;
+    }</span> <span class="delete" data-for="habit${habit.id}">X</span>`;
     habitsList.append(habitListItem);
 
     // add toggle listener
@@ -110,7 +117,7 @@ window.addEventListener("DOMContentLoaded", () => {
   domains.forEach((domain, i) => {
     let domainListItem = document.createElement("li");
     domainListItem.innerHTML = `
-    <span contenteditable="true">${domain.host}</span> <span>X</span>
+    <span contenteditable="true">${domain.host}</span> <span class="delete">X</span>
   `;
     domainsList.append(domainListItem);
 
@@ -143,13 +150,14 @@ addHabitButton.addEventListener("click", () => {
   newHabitListItem.innerHTML = `
   <input type="checkbox" class="habitToggle" id="habit${id}" ${
     habit.completed ? "checked" : ""
-  } /> <span contenteditable="true" data-for="habit${id}">${
+  } /> <span contenteditable="true" data-placeholder="${
     habit.title
-  }</span> <span data-for="habit${id}">X</span>`;
+  }" data-for="habit${id}"></span> <span class="delete" data-for="habit${id}">X</span>`;
 
   habits.push(habit);
   // chrome.storage.sync.set({ habits: habits });
   habitsList.appendChild(newHabitListItem);
+  newHabitListItem.children[1].focus();
 
   console.log("Habit after add: ", habits);
 
@@ -167,7 +175,7 @@ const addDomainButton = document.querySelector("#add-domain");
 
 // add new domain to block
 addDomainButton.addEventListener("click", () => {
-  let newHost = "add new";
+  let newHost = "ie. instagram or netflix.com";
   let id;
   if (domains[domains.length - 1]) {
     // this op is ok since it is ordered but be careful
@@ -177,11 +185,12 @@ addDomainButton.addEventListener("click", () => {
   }
   let newDomainListItem = document.createElement("li");
   newDomainListItem.innerHTML = `
-  <span contenteditable="true">${newHost}</span> <span>X</span>
+  <span contenteditable="true" data-placeholder="${newHost}"></span> <span class="delete">X</span>
   `;
 
-  domains.push({ id: id, host: newHost });
+  domains.push({ id: id, host: "" });
   domainsList.appendChild(newDomainListItem);
+  newDomainListItem.children[0].focus();
 
   console.log("New Domain Added: ", domains);
 
