@@ -91,9 +91,11 @@ window.addEventListener("DOMContentLoaded", () => {
     habitListItem.innerHTML = `
         <input type="checkbox" class="habitToggle" id="habit${habit.id}" ${
       habit.completed ? "checked" : ""
-    } /> <span contenteditable="true" data-for="habit${habit.id}">${
-      habit.title
-    }</span> <span class="delete" data-for="habit${habit.id}">X</span>`;
+    } /> <span contenteditable="true" data-habit=${habit.id} data-for="habit${
+      habit.id
+    }">${habit.title}</span> <span class="delete" data-for="habit${
+      habit.id
+    }">X</span>`;
     habitsList.append(habitListItem);
 
     // add toggle listener
@@ -152,7 +154,7 @@ addHabitButton.addEventListener("click", () => {
     habit.completed ? "checked" : ""
   } /> <span contenteditable="true" data-placeholder="${
     habit.title
-  }" data-for="habit${id}"></span> <span class="delete" data-for="habit${id}">X</span>`;
+  }" data-habit=${id} data-for="habit${id}"></span> <span class="delete" data-for="habit${id}">X</span>`;
 
   habits.push(habit);
   // chrome.storage.sync.set({ habits: habits });
@@ -233,4 +235,49 @@ window.addEventListener("keydown", (e) => {
       isSettingsOpen = true;
     }
   }
+
+  if (e.code === "Enter") {
+    // if one of the todos contenteditables are focused
+    //  when 'Enter' is pressed create a new todo underneath
+    if (document.activeElement.hasAttribute("data-habit")) {
+      // disable new line by enter
+      e.preventDefault();
+
+      let id = document.activeElement.getAttribute("data-habit");
+      let index = null;
+      // get habits, insert into the index after the click
+      habits.filter((habit, i) => {
+        if (habit.id === Number(id)) {
+          index = i;
+          return true;
+        }
+        return false;
+      });
+
+      habits.splice(index, 0, {
+        id: id,
+        title: "To-do",
+        completed: false,
+      });
+      // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
+
+      console.log();
+      console.log("Enter has been pressed while editing todos");
+      console.log(habits);
+    }
+
+    console.log(document.activeElement);
+  }
 });
+
+/* TODOS:
+[] To add new todo after Enter. need a mechanism to render. Don't wanna use React yet, just clean the code for f*s sake.
+  - add new habit, should both change the state and render the ui
+  - remove new habit, same
+[] delete the todo with Backspace when it is empty
+[] discard empty todo if no input is given.
+[] add a 6 dot icon to the left
+
+
+It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
+*/
