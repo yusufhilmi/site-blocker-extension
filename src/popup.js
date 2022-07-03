@@ -200,3 +200,37 @@ addDomainButton.addEventListener("click", () => {
   // handle delete
   handleDeleteDomain(newDomainListItem.children[1], id);
 });
+
+let isSettingsOpen = false;
+const settingsButton = document.querySelector("#settings");
+const backButton = document.querySelector(".back-button");
+const settingsContainer = document.querySelector(".settings-container");
+
+settingsButton.addEventListener("click", () => {
+  if (!isSettingsOpen) {
+    settingsContainer.classList.remove("hidden");
+    isSettingsOpen = true;
+  }
+});
+
+backButton.addEventListener("click", () => {
+  if (isSettingsOpen) {
+    settingsContainer.classList.add("hidden");
+    isSettingsOpen = false;
+  }
+});
+
+window.addEventListener("keydown", (e) => {
+  console.log(e);
+  if (isSettingsOpen) {
+    if (e.code === "BracketLeft") {
+      settingsContainer.classList.add("hidden");
+      isSettingsOpen = false;
+    }
+  } else {
+    if (e.code === "BracketRight") {
+      settingsContainer.classList.remove("hidden");
+      isSettingsOpen = true;
+    }
+  }
+});

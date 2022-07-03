@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 :root {
   --primary: #fff;
-  --text: #000;
+  --text: #1f1f1f;
   --placeholder: #ddd;
 }
 
@@ -12,14 +12,14 @@ html {
 
 body {
   font-family: "Roboto Mono", monospace;
-  padding: 0.125rem 0.5rem 1rem 1rem;
-  width: 400px;
+  min-width: 320px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 600;
-  margin: 1rem 0 0.25rem 0;
 }
 
 button {
@@ -43,7 +43,7 @@ li {
 
 span {
   display: inline-block;
-  padding: 4px;
+  /* padding: 4px; */
 }
 
 li:hover {
@@ -80,4 +80,66 @@ li:hover > .delete {
 
 li:hover > [contenteditable="true"]:empty:before {
   color: var(--text);
+}
+
+.focus-text {
+  font-size: 48px;
+  font-weight: 700;
+  text-align: center;
+  margin: 64px 24px 12px;
+}
+
+.cog {
+  fill: #1f1f1f;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.cog:hover {
+  background: #e6e6e6;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  margin: 36px 24px;
+}
+
+.settings-container {
+  position: absolute;
+  background-color: #fff;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 36px 24px;
+}
+
+.hidden {
+  display: none;
+}
+
+.back-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: -26px;
+  left: -14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.back-button:hover {
+  background-color: #e6e6e6;
+}
+
+.back-arrow {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-top: solid 1px #1f1f1f;
+  border-left: solid 1px #1f1f1f;
+  transform: rotate(-45deg);
+  margin-left: 4px;
 }
