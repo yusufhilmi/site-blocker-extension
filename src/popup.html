@@ -3,20 +3,19 @@
   <head>
     <title>Site Blocker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./styles/output.css" />
   </head>
 
-  <body class="popup-container">
-    <div class="container">
+  <body class="mx-auto min-w-[320px] max-w-[400px]">
+    <div class="main-container m-4 flex justify-between">
       <div>
-        <h2 class="">Habits</h2>
+        <h2>Todos</h2>
         <ol id="habits"></ol>
         <div id="add-habit">+ Add new</div>
       </div>
       <div title="Go to domain settings ]">
         <svg
-          class="cog"
+          class="rounded fill-hab-900 p-0.5 hover:bg-hab-300"
           id="settings"
           width="32"
           height="32"
@@ -76,8 +75,6 @@
       </div>
     </div>
 
-    <p class="focus-text">Focus!</p>
-
     <div class="settings-container hidden">
       <div class="back-button" title="Go Back [">
         <span class="back-arrow"></span>
@@ -87,6 +84,7 @@
       <div id="add-domain">+ Add new</div>
     </div>
 
+    <p class="mx-6 mt-16 mb-3 text-center text-5xl font-bold">Focus!</p>
     <script src="popup.js"></script>
   </body>
 </html>
