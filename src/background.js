@@ -40,6 +40,6 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
   console.log(sender.tab.id);
   console.log(request);
   chrome.tabs.update(sender.tab.id, {
-    url: chrome.runtime.getURL("popup.html"),
+    url: chrome.runtime.getURL("blocked-page.html"),
   });
 });
