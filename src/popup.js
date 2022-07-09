@@ -16,6 +16,7 @@ const editHabit = (e) => {
   const habit = habits.find((habit) => habit.id === habitId);
   if (!e.target.textContent) {
     deleteHabit(e.target);
+    return;
   }
   habit.title = e.target.textContent;
   console.log("from edit target text content:", e.target);
@@ -237,6 +238,7 @@ window.addEventListener("keydown", (e) => {
     title: "To-do",
     completed: false,
   };
+  let selection = window.getSelection();
 
   if (e.code === "Enter") {
     // if one of the todos contenteditables are focused
@@ -256,32 +258,34 @@ window.addEventListener("keydown", (e) => {
         return;
       }
 
-      let id = document.activeElement.getAttribute("data-habit");
-      let index = null;
-      // get habits, insert into the index after the click
-      habits.filter((habit, i) => {
-        if (habit.id === Number(id)) {
-          index = i;
-          return true;
-        }
-        return false;
-      });
+      if (
+        selection.focusNode?.nodeType === 3 &&
+        selection.focusOffset === selection.focusNode.length
+      ) {
+        let id = document.activeElement.getAttribute("data-habit");
+        let index = null;
+        // get habits, insert into the index after the click
+        habits.filter((habit, i) => {
+          if (habit.id === Number(id)) {
+            index = i;
+            return true;
+          }
+          return false;
+        });
 
-      habits.splice(index, 0, habit);
-      // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
-      habit.id = id;
-      addHabit(id, habit, true);
+        habits.splice(index, 0, habit);
+        // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
+        habit.id = id;
+        addHabit(id, habit, true);
 
-      console.log();
-      console.log("Enter has been pressed while editing todos");
-      console.log(habits);
+        console.log();
+        console.log("Enter has been pressed while editing todos");
+        console.log(habits);
+      }
     }
-
-    console.log(document.activeElement);
   }
 
   if (e.code === "Backspace") {
-    let selection = window.getSelection();
     let id = document.activeElement.getAttribute("data-habit");
     if (id && selection.focusNode?.nodeType === 1) {
       deleteHabit(e.target);
