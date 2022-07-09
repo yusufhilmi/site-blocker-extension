@@ -12,6 +12,9 @@ html {
 
 body {
   font-family: "Roboto Mono", monospace;
+}
+
+.popup-container {
   min-width: 320px;
   max-width: 400px;
   margin: 0 auto;
