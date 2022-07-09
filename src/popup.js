@@ -14,14 +14,11 @@ const handleToggle = (el, habit) => {
 const editHabit = (e) => {
   const habitId = Number(e.target.getAttribute("data-for").substring(5));
   const habit = habits.find((habit) => habit.id === habitId);
+  if (!e.target.textContent) {
+    deleteHabit(e.target);
+  }
   habit.title = e.target.textContent;
   console.log("from edit target text content:", e.target);
-  // if (e.target.textContent === "") {
-  //   const habitIndex = habits.findIndex((habit) => habit.id === habitId);
-  //   habits.slice(habitIndex, 1);
-  //   el.parentElement.remove();
-  // }
-
   // sync storage
   // chrome.storage.sync.set({ habits: habits });
 };
@@ -33,7 +30,6 @@ const handleEditHabit = (el) => {
 const handleEditDomain = (el, id) => {
   el.addEventListener("blur", (e) => {
     // if (e.target.textContent === "") el.remove();
-
     const domain = domains.find((domain) => domain.id === id);
 
     domain.host = e.target.textContent;
@@ -73,7 +69,7 @@ const handleDelete = (el) => {
   });
 };
 
-// TODO:
+// TODO: not sure if add new button should always be there or not
 // const showAddNewHabitButton = () => {
 //   console.log("show the add new button now");
 // };
@@ -265,6 +261,17 @@ window.addEventListener("keydown", (e) => {
       // disable new line by enter
       e.preventDefault();
 
+      if (e.metaKey || e.ctrlKey) {
+        console.log(e.target.previousElementSibling);
+        let inp = e.target.previousElementSibling;
+        if (inp.checked) {
+          inp.checked = false;
+        } else {
+          inp.checked = true;
+        }
+        return;
+      }
+
       let id = document.activeElement.getAttribute("data-habit");
       let index = null;
       // get habits, insert into the index after the click
@@ -305,12 +312,11 @@ window.addEventListener("keydown", (e) => {
 });
 
 /* TODOS:
-[] To add new todo after Enter. need a mechanism to render. Don't wanna use React yet, just clean the code for f*s sake.
+[x] To add new todo after Enter. need a mechanism to render. Don't wanna use React yet, just clean the code for f*s sake.
   - add new habit, should both change the state and render the ui
   - remove new habit, same
-[] delete the todo with Backspace when it is empty
-[] discard empty todo if no input is given.
-[] add a 6 dot icon to the left
+[x] delete the todo with Backspace when it is empty
+[x] discard empty todo if no input is given.
 
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
