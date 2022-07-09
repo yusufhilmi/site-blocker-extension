@@ -11,20 +11,23 @@ const handleToggle = (el, habit) => {
   });
 };
 
-const handleEditHabit = (el) => {
-  el.addEventListener("blur", (e) => {
-    const habitId = Number(e.target.getAttribute("data-for").substring(5));
-    const habit = habits.find((habit) => habit.id === habitId);
-    habit.title = e.target.textContent;
-    // if (e.target.textContent === "") {
-    //   const habitIndex = habits.findIndex((habit) => habit.id === habitId);
-    //   habits.slice(habitIndex, 1);
-    //   el.parentElement.remove();
-    // }
+const editHabit = (e) => {
+  const habitId = Number(e.target.getAttribute("data-for").substring(5));
+  const habit = habits.find((habit) => habit.id === habitId);
+  habit.title = e.target.textContent;
+  console.log("from edit target text content:", e.target);
+  // if (e.target.textContent === "") {
+  //   const habitIndex = habits.findIndex((habit) => habit.id === habitId);
+  //   habits.slice(habitIndex, 1);
+  //   el.parentElement.remove();
+  // }
 
-    // sync storage
-    // chrome.storage.sync.set({ habits: habits });
-  });
+  // sync storage
+  // chrome.storage.sync.set({ habits: habits });
+};
+
+const handleEditHabit = (el) => {
+  el.addEventListener("blur", editHabit);
 };
 
 const handleEditDomain = (el, id) => {
@@ -70,6 +73,62 @@ const handleDelete = (el) => {
   });
 };
 
+// TODO:
+// const showAddNewHabitButton = () => {
+//   console.log("show the add new button now");
+// };
+// const hideAddNewHabitButton = () => {
+//   console.log("hide the add new button now");
+// };
+
+const deleteHabit = (el) => {
+  const habitId = Number(el.getAttribute("data-for").substring(5));
+  const habit = habits.find((habit) => habit.id === habitId);
+  console.log(habit, habitId, el);
+  // get the index and cut it out from the habits array
+  let index = habits.findIndex((habit) => habit.id === habitId);
+  habits.splice(index, 1);
+
+  // sync it with storage
+  // chrome.storage.sync.set({ habits: habits });
+  el.removeEventListener("blur", editHabit);
+
+  // if (habitsList.children.length === 1) showAddNewHabitButton();
+  el.parentElement.remove();
+};
+
+const addHabit = (id, habit, isNew = false) => {
+  let newHabitListItem = document.createElement("li");
+  newHabitListItem.innerHTML = `
+  <input type="checkbox" class="habitToggle" id="habit${id}" ${
+    habit.completed ? "checked" : ""
+  } /> <span contenteditable="true"${
+    isNew ? "data-placeholder=" + habit.title : ""
+  } data-habit=${id} data-for="habit${id}">${
+    isNew ? "" : habit.title
+  }</span> <span class="delete" data-for="habit${id}">X</span>`;
+
+  // if (habitsList.children.length === 0) hideAddNewHabitButton()
+  habitsList.appendChild(newHabitListItem);
+  if (isNew) {
+    habits.push(habit);
+    // chrome.storage.sync.set({ habits: habits });
+    newHabitListItem.children[1].focus();
+    console.log("Habit after add: ", habits);
+  }
+
+  // add toggle listener
+  handleToggle(newHabitListItem.children[0], habit);
+
+  // add title update/edit listener
+  handleEditHabit(newHabitListItem.children[1]);
+
+  // add click listener to remove a habit
+  handleDelete(newHabitListItem.children[2]);
+};
+
+const addDomain = () => {};
+
 const domainsList = document.getElementById("domains");
 const habitsList = document.getElementById("habits");
 let habits = [];
@@ -87,27 +146,9 @@ window.addEventListener("DOMContentLoaded", () => {
   ];
 
   habits.forEach((habit) => {
-    let habitListItem = document.createElement("li");
-    habitListItem.innerHTML = `
-        <input type="checkbox" class="habitToggle" id="habit${habit.id}" ${
-      habit.completed ? "checked" : ""
-    } /> <span contenteditable="true" data-habit=${habit.id} data-for="habit${
-      habit.id
-    }">${habit.title}</span> <span class="delete" data-for="habit${
-      habit.id
-    }">X</span>`;
-    habitsList.append(habitListItem);
-
-    // add toggle listener
-    handleToggle(habitListItem.children[0], habit);
-
-    // add title update/edit listener
-    handleEditHabit(habitListItem.children[1]);
-
-    // add click listener to remove a habit
-    handleDelete(habitListItem.children[2]);
+    addHabit(habit.id, habit);
   });
-  // }); // end of habits sync
+  // }); // end of habits storage sync
 
   domains = [
     { id: 1, host: "youtube.com" },
@@ -148,29 +189,7 @@ addHabitButton.addEventListener("click", () => {
     completed: false,
   };
 
-  let newHabitListItem = document.createElement("li");
-  newHabitListItem.innerHTML = `
-  <input type="checkbox" class="habitToggle" id="habit${id}" ${
-    habit.completed ? "checked" : ""
-  } /> <span contenteditable="true" data-placeholder="${
-    habit.title
-  }" data-habit=${id} data-for="habit${id}"></span> <span class="delete" data-for="habit${id}">X</span>`;
-
-  habits.push(habit);
-  // chrome.storage.sync.set({ habits: habits });
-  habitsList.appendChild(newHabitListItem);
-  newHabitListItem.children[1].focus();
-
-  console.log("Habit after add: ", habits);
-
-  // add toggle listener
-  handleToggle(newHabitListItem.children[0], habit);
-
-  // add title update/edit listener
-  handleEditHabit(newHabitListItem.children[1]);
-
-  // add click listener to remove a habit
-  handleDelete(newHabitListItem.children[2]);
+  addHabit(id, habit, true);
 });
 
 const addDomainButton = document.querySelector("#add-domain");
@@ -207,10 +226,12 @@ let isSettingsOpen = false;
 const settingsButton = document.querySelector("#settings");
 const backButton = document.querySelector(".back-button");
 const settingsContainer = document.querySelector(".settings-container");
+const mainContainer = document.querySelector(".container");
 
 settingsButton.addEventListener("click", () => {
   if (!isSettingsOpen) {
     settingsContainer.classList.remove("hidden");
+    mainContainer.classList.add("hidden");
     isSettingsOpen = true;
   }
 });
@@ -218,6 +239,7 @@ settingsButton.addEventListener("click", () => {
 backButton.addEventListener("click", () => {
   if (isSettingsOpen) {
     settingsContainer.classList.add("hidden");
+    mainContainer.classList.remove("hidden");
     isSettingsOpen = false;
   }
 });
@@ -254,12 +276,16 @@ window.addEventListener("keydown", (e) => {
         return false;
       });
 
-      habits.splice(index, 0, {
+      let habit = {
         id: id,
         title: "To-do",
         completed: false,
-      });
+      };
+
+      habits.splice(index, 0, habit);
       // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
+
+      addHabit(id, habit, true);
 
       console.log();
       console.log("Enter has been pressed while editing todos");
@@ -267,6 +293,14 @@ window.addEventListener("keydown", (e) => {
     }
 
     console.log(document.activeElement);
+  }
+
+  if (e.code === "Backspace") {
+    let selection = window.getSelection();
+    let id = document.activeElement.getAttribute("data-habit");
+    if (id && selection.focusNode?.nodeType === 1) {
+      deleteHabit(e.target);
+    }
   }
 });
 

@@ -81,6 +81,10 @@ li:hover > .delete {
   display: inline-block;
 }
 
+[contenteditable="true"] {
+  outline: none;
+}
+
 li:hover > [contenteditable="true"]:empty:before {
   color: var(--text);
 }
