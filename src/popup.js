@@ -71,8 +71,15 @@ const deleteHabit = (el) => {
 
   // sync it with storage
   // chrome.storage.sync.set({ habits: habits });
+
   el.removeEventListener("blur", editHabit);
 
+  // focus on previous parents previous sibling
+  el.parentElement.previousElementSibling?.children[1].focus();
+  let selection = document.getSelection();
+  selection.collapse(selection.focusNode, selection.focusNode.length);
+  console.log(selection);
+  // document.getSelection().collapse(this.target, pos)
   // if (habitsList.children.length === 1) showAddNewHabitButton();
   el.parentElement.remove();
 };
@@ -201,7 +208,7 @@ let isSettingsOpen = false;
 const settingsButton = document.querySelector("#settings");
 const backButton = document.querySelector(".back-button");
 const settingsContainer = document.querySelector(".settings-container");
-const mainContainer = document.querySelector(".container");
+const mainContainer = document.querySelector(".main-container");
 
 settingsButton.addEventListener("click", () => {
   if (!isSettingsOpen) {
@@ -220,15 +227,17 @@ backButton.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (e) => {
-  console.log(e);
+  console.log(habits);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
       settingsContainer.classList.add("hidden");
+      mainContainer.classList.remove("hidden");
       isSettingsOpen = false;
     }
   } else {
     if (e.code === "BracketRight") {
       settingsContainer.classList.remove("hidden");
+      mainContainer.classList.add("hidden");
       isSettingsOpen = true;
     }
   }
@@ -262,21 +271,19 @@ window.addEventListener("keydown", (e) => {
         selection.focusNode?.nodeType === 3 &&
         selection.focusOffset === selection.focusNode.length
       ) {
-        let id = document.activeElement.getAttribute("data-habit");
-        let index = null;
-        // get habits, insert into the index after the click
+        let maxIndex = 0;
+        // get habits, just insert to the bottom
         habits.filter((habit, i) => {
-          if (habit.id === Number(id)) {
-            index = i;
+          if (habit.id >= maxIndex) {
+            maxIndex = habit.id;
             return true;
           }
           return false;
         });
 
-        habits.splice(index, 0, habit);
         // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
-        habit.id = id;
-        addHabit(id, habit, true);
+        habit.id = maxIndex + 1;
+        addHabit(habit.id, habit, true);
 
         console.log();
         console.log("Enter has been pressed while editing todos");
@@ -288,11 +295,12 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "Backspace") {
     let id = document.activeElement.getAttribute("data-habit");
     if (id && selection.focusNode?.nodeType === 1) {
+      e.preventDefault();
       deleteHabit(e.target);
     }
   }
 
-  if (habitsList.children.length === 0 && e.code === "KeyN") {
+  if (document.activeElement === document.body && e.code === "KeyN") {
     e.preventDefault();
     habit.id = 0;
     addHabit(0, habit, true);
@@ -301,7 +309,7 @@ window.addEventListener("keydown", (e) => {
 
 /* TODO:
 [x] clear ui, delete X button.
-[]focus on previous habit after delete
+[x]focus on previous habit after delete
 [] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
 
 
