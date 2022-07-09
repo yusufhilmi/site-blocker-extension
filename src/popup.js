@@ -52,23 +52,6 @@ const handleDeleteDomain = (el, id) => {
   });
 };
 
-const handleDelete = (el) => {
-  el.addEventListener("click", (e) => {
-    const habitId = Number(e.target.getAttribute("data-for").substring(5));
-    const habit = habits.find((habit) => habit.id === habitId);
-    // additional check in case unrealized bugs pop up
-    if (habit.title === el.previousElementSibling.textContent) {
-      // get the index and cut it out from the habits array
-      let index = habits.findIndex((habit) => habit.id === habitId);
-      habits.splice(index, 1);
-
-      // sync it with storage
-      // chrome.storage.sync.set({ habits: habits });
-      el.parentElement.remove();
-    }
-  });
-};
-
 // TODO: not sure if add new button should always be there or not
 // const showAddNewHabitButton = () => {
 //   console.log("show the add new button now");
@@ -100,9 +83,7 @@ const addHabit = (id, habit, isNew = false) => {
     habit.completed ? "checked" : ""
   } /> <span contenteditable="true"${
     isNew ? "data-placeholder=" + habit.title : ""
-  } data-habit=${id} data-for="habit${id}">${
-    isNew ? "" : habit.title
-  }</span> <span class="delete" data-for="habit${id}">X</span>`;
+  } data-habit=${id} data-for="habit${id}">${isNew ? "" : habit.title}</span>`;
 
   // if (habitsList.children.length === 0) hideAddNewHabitButton()
   habitsList.appendChild(newHabitListItem);
@@ -118,9 +99,6 @@ const addHabit = (id, habit, isNew = false) => {
 
   // add title update/edit listener
   handleEditHabit(newHabitListItem.children[1]);
-
-  // add click listener to remove a habit
-  handleDelete(newHabitListItem.children[2]);
 };
 
 const addDomain = () => {};
@@ -254,6 +232,12 @@ window.addEventListener("keydown", (e) => {
     }
   }
 
+  let habit = {
+    id: null,
+    title: "To-do",
+    completed: false,
+  };
+
   if (e.code === "Enter") {
     // if one of the todos contenteditables are focused
     //  when 'Enter' is pressed create a new todo underneath
@@ -283,15 +267,9 @@ window.addEventListener("keydown", (e) => {
         return false;
       });
 
-      let habit = {
-        id: id,
-        title: "To-do",
-        completed: false,
-      };
-
       habits.splice(index, 0, habit);
       // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
-
+      habit.id = id;
       addHabit(id, habit, true);
 
       console.log();
@@ -309,14 +287,18 @@ window.addEventListener("keydown", (e) => {
       deleteHabit(e.target);
     }
   }
+
+  if (habitsList.children.length === 0 && e.code === "KeyN") {
+    e.preventDefault();
+    habit.id = 0;
+    addHabit(0, habit, true);
+  }
 });
 
-/* TODOS:
-[x] To add new todo after Enter. need a mechanism to render. Don't wanna use React yet, just clean the code for f*s sake.
-  - add new habit, should both change the state and render the ui
-  - remove new habit, same
-[x] delete the todo with Backspace when it is empty
-[x] discard empty todo if no input is given.
+/* TODO:
+[x] clear ui, delete X button.
+[]focus on previous habit after delete
+[] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
 
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
