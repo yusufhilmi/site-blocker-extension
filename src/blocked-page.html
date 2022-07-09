@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="/src/styles/output.css" />
   </head>
 
-  <body class="container mx-auto h-screen p-4 font-mono md:p-8 lg:p-16">
+  <body
+    class="container mx-auto h-screen p-4 font-mono text-hab-900 dark:bg-hab-900 dark:text-white md:p-8 lg:p-16"
+  >
     <div class="mb-12 text-center text-3xl font-semibold lg:mb-24">
       <h1 class="mb-6 text-9xl lg:mb-12">Focus!</h1>
       <h2 class="mb-9">Take 5 seconds to reflect</h2>
@@ -19,17 +21,17 @@
         Finish your todos
       </h2>
       <ol id="habits" class="flex justify-center">
-        <li class="flex items-center gap-2">
+        <li class="flex items-center gap-2 rounded-md p-2">
           <input
             type="checkbox"
             name="habit"
             id="1"
-            class="peer h-6 w-6 rounded-none border border-gray-600"
+            class="peer h-6 w-6 dark:bg-hab-900 dark:text-hab-900"
           />
           <span
-            class="text-2xl peer-checked:text-gray-500 peer-checked:line-through"
+            class="text-2xl peer-checked:text-hab-600 peer-checked:line-through"
             contenteditable="true"
-            >Read book - 30min</span
+            >Read book for 30min</span
           >
         </li>
       </ol>
