@@ -81,10 +81,7 @@
     </div>
 
     <div class="settings-container hidden">
-      <button
-        class="back-button outline-none focus-visible:bg-hab-300"
-        title="Go Back -> [ "
-      >
+      <button class="back-button" title="Go Back -> [ ">
         <span class="back-arrow"></span>
       </button>
       <h2 class="pl-1">Domains</h2>
@@ -93,20 +90,8 @@
 
       <h2 class="mt-6 mb-2 pl-1">Redirect</h2>
       <div class="mb-4 flex gap-4">
-        <button
-          id="redirect-default"
-          class="mt-0.5 w-28 rounded-md px-2 py-1 outline-none transition duration-150 ease-in-out hover:scale-105 focus-visible:bg-hab-300"
-          data-active="true"
-        >
-          Default
-        </button>
-        <button
-          id="redirect-custom"
-          class="mt-0.5 w-28 rounded-md px-2 py-1 outline-none transition duration-150 ease-in-out hover:scale-105 focus-visible:bg-hab-300"
-          data-active="false"
-        >
-          Custom
-        </button>
+        <button id="redirect-default" data-active="true">Default</button>
+        <button id="redirect-custom" data-active="false">Custom</button>
       </div>
       <input
         type="url"

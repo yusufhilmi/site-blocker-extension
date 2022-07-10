@@ -19,7 +19,7 @@ h2 {
 }
 
 .new-button {
-  @apply -ml-1 mt-0.5 rounded-md px-2 py-1 text-hab-300 outline-none transition duration-150 ease-in-out hover:scale-105 hover:bg-hab-300 focus-visible:bg-hab-300  dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50;
+  @apply -ml-1 mt-0.5 rounded-md px-2 py-1 outline-none transition duration-150 ease-in-out hover:scale-105 hover:bg-hab-300 focus-visible:scale-105 focus-visible:bg-hab-300 dark:text-hab-300  dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50;
 }
 
 /* todo items */
@@ -49,7 +49,7 @@ h2 {
 }
 
 .back-button {
-  @apply absolute -top-5 -left-7 inline-flex h-6 w-6 items-center justify-center rounded transition duration-150 ease-in-out hover:scale-110 hover:bg-hab-300 dark:hover:bg-hab-600/50;
+  @apply absolute -top-5 -left-7 inline-flex h-6 w-6 items-center justify-center rounded outline-none transition duration-150 ease-in-out hover:scale-110 hover:bg-hab-300 focus-visible:scale-110  focus-visible:bg-hab-300 dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50;
 }
 
 .back-arrow {
@@ -69,6 +69,10 @@ h2 {
 }
 #domains > li:focus-within > .delete {
   @apply inline;
+}
+
+button[data-active] {
+  @apply mt-0.5 w-28 rounded-md px-2 py-1 outline-none transition duration-150 ease-in-out hover:scale-105 focus-visible:scale-105;
 }
 
 button[data-active="false"] {
