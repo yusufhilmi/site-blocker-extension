@@ -133,14 +133,20 @@ const editDomain = (e) => {
 };
 
 const deleteDomain = (el, id) => {
-  const domainIndex = domains.findIndex((domain) => domain.id === id);
-  domains.splice(domainIndex, 1);
-  // sync storage
-  chrome.storage.sync.set({ domains });
+  const sure = prompt(
+    "Are you sure you want to delete this domain? \n Write DELETE DOMAIN to delete it."
+  );
 
-  // will come into play with the keyboard shortcuts and tricks
-  el.removeEventListener("blur", editDomain);
-  el.parentElement.remove();
+  if (sure === "DELETE DOMAIN") {
+    const domainIndex = domains.findIndex((domain) => domain.id === id);
+    domains.splice(domainIndex, 1);
+    // sync storage
+    chrome.storage.sync.set({ domains });
+
+    // will come into play with the keyboard shortcuts and tricks
+    el.removeEventListener("blur", editDomain);
+    el.parentElement.remove();
+  }
 };
 
 const getNewId = (arr) => {
@@ -400,7 +406,7 @@ window.addEventListener("keydown", (e) => {
 /* TODO:
 [] while closing the blocker for a domain take text input saying "I want to be lazy" or "I will be closer to my targets"
     point is get some text input, don't blame but increase awareness, set a timer boom ure in!
-[] add more friction to delete a domain
+[x] add more friction to delete a domain
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
 */
