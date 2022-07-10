@@ -26,7 +26,6 @@ const handleDeleteDomain = (el, id) => {
 
 const deleteHabit = (el) => {
   const habitId = Number(el.getAttribute("data-habit"));
-  // console.log(habit, habitId, el);
   // get the index and cut it out from the habits array
   let index = habits.findIndex((habit) => habit.id === habitId);
   habits.splice(index, 1);
@@ -42,14 +41,29 @@ const deleteHabit = (el) => {
   el.parentElement.remove();
 };
 
-const addHabit = (id, habit, isNew = false) => {
+const addHabit = (habit = {}, isNew = false) => {
+  let id;
+  if (isNew) {
+    id = getNewId(habits);
+    habit = {
+      id: id,
+      title: "",
+      completed: false,
+    };
+  } else {
+    if (typeof habit.id !== "number") {
+      console.error("can't add empty habit");
+      return;
+    }
+  }
+
   let newHabitListItem = document.createElement("li");
   newHabitListItem.innerHTML = `
-  <input type="checkbox" class="habitToggle" id="habit${id}" ${
+  <input type="checkbox" class="habitToggle"${
     habit.completed ? "checked" : ""
   } /> <span contenteditable="true"${
-    isNew ? "data-placeholder=" + habit.title : ""
-  } data-habit=${id} data-for="habit${id}">${isNew ? "" : habit.title}</span>`;
+    isNew ? "data-placeholder=To-do" : ""
+  } data-habit=${habit.id} ">${isNew ? "" : habit.title}</span>`;
 
   // if (habitsList.children.length === 0) hideAddNewHabitButton()
   habitsList.appendChild(newHabitListItem);
@@ -57,7 +71,6 @@ const addHabit = (id, habit, isNew = false) => {
     habits.push(habit);
     // chrome.storage.sync.set({ habits: habits });
     newHabitListItem.children[1].focus();
-    // console.log("Habit after add: ", habits);
   }
 
   // add toggle listener
@@ -68,14 +81,13 @@ const addHabit = (id, habit, isNew = false) => {
 };
 
 const editHabit = (e) => {
-  const habitId = Number(e.target.getAttribute("data-for").substring(5));
+  const habitId = Number(e.target.getAttribute("data-habit"));
   const habit = habits.find((habit) => habit.id === habitId);
   if (!e.target.textContent) {
     deleteHabit(e.target);
     return;
   }
   habit.title = e.target.textContent;
-  // console.log("from edit target text content:", e.target);
   // sync storage
   // chrome.storage.sync.set({ habits: habits });
 };
@@ -102,7 +114,6 @@ const addDomain = (domain, isNew = false) => {
   if (isNew) {
     domains.push(domain);
     domainListItem.children[0].focus();
-    // console.log("New Domain Added: ", domains);
   }
 };
 
@@ -117,7 +128,6 @@ const editDomain = (e) => {
 
   domain.host = e.target.textContent;
 
-  console.log(domains);
   // sync storage
   // chrome.storage.sync.set({ domains: domains });
 };
@@ -127,7 +137,6 @@ const deleteDomain = (el, id) => {
   domains.splice(domainIndex, 1);
   // sync storage
   // chrome.storage.sync.set({ domains: domains });
-  // console.log(domains);
 
   // will come into play with the keyboard shortcuts and tricks
   el.removeEventListener("blur", editDomain);
@@ -155,7 +164,7 @@ const habitsList = document.getElementById("habits");
 let habits = [];
 let domains = [];
 
-window.addEventListener("DOMContentLoaded", () => {
+const loadHabits = () => {
   // chrome.storage.sync.get(["habits"], (res) => {
   // habits = res.habits;
   habits = [
@@ -167,10 +176,12 @@ window.addEventListener("DOMContentLoaded", () => {
   ];
 
   habits.forEach((habit) => {
-    addHabit(habit.id, habit);
+    addHabit(habit);
   });
   // }); // end of habits storage sync
+};
 
+const loadDomains = () => {
   domains = [
     { id: 1, host: "youtube.com" },
     { id: 2, host: "instagram.com" },
@@ -181,20 +192,18 @@ window.addEventListener("DOMContentLoaded", () => {
   domains.forEach((domain) => {
     addDomain(domain);
   });
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadHabits();
+  loadDomains();
 });
 
 const addHabitButton = document.getElementById("add-habit");
 
 // add habit
 addHabitButton.addEventListener("click", () => {
-  let id = getNewId(habits);
-  let habit = {
-    id: id,
-    title: "To-do",
-    completed: false,
-  };
-
-  addHabit(id, habit, true);
+  addHabit({}, true);
 });
 
 const addDomainButton = document.querySelector("#add-domain");
@@ -269,7 +278,6 @@ const validateURL = () => {
 };
 
 customRedirectButton.addEventListener("click", (e) => {
-  console.log("clicked custom");
   isActive = e.target.getAttribute("data-active");
   if (isActive === "true") {
     activateDefault();
@@ -279,7 +287,6 @@ customRedirectButton.addEventListener("click", (e) => {
 });
 
 defaultRedirectButton.addEventListener("click", (e) => {
-  console.log("clicked default");
   isActive = e.target.getAttribute("data-active");
   if (isActive === "true") {
     activateCustom();
@@ -294,7 +301,6 @@ customRedirectLinkInput.addEventListener("blur", (e) => {
 
 // handle keyboard events
 window.addEventListener("keydown", (e) => {
-  console.log(domains);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
       e.preventDefault();
@@ -307,11 +313,6 @@ window.addEventListener("keydown", (e) => {
     }
   }
 
-  let habit = {
-    id: null,
-    title: "To-do",
-    completed: false,
-  };
   let selection = window.getSelection();
 
   if (e.code === "Enter") {
@@ -323,7 +324,6 @@ window.addEventListener("keydown", (e) => {
 
       // check the checkbox with cmd+enter combination
       if (e.metaKey || e.ctrlKey) {
-        // console.log(e.target.previousElementSibling);
         let inp = e.target.previousElementSibling;
         if (inp.checked) {
           inp.checked = false;
@@ -338,8 +338,7 @@ window.addEventListener("keydown", (e) => {
         selection.focusOffset === selection.focusNode.length
       ) {
         // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
-        habit.id = getNewId(habits);
-        addHabit(habit.id, habit, true);
+        addHabit({}, true);
       }
     }
     if (document.activeElement.hasAttribute("data-domain")) {
@@ -371,9 +370,7 @@ window.addEventListener("keydown", (e) => {
     e.code === "KeyN"
   ) {
     e.preventDefault();
-    let id = getNewId(habits);
-    habit.id = id;
-    addHabit(id, habit, true);
+    addHabit({}, true);
   }
 
   if (e.code === "Escape") {
