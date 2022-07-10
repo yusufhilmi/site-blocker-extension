@@ -11,12 +11,17 @@
       <div>
         <h2>Todos</h2>
         <ol id="habits"></ol>
-        <div id="add-habit">+ Add new</div>
+        <button title="Add new todo = N" class="new-button" id="add-habit">
+          New +
+        </button>
       </div>
-      <div title="Go to domain settings ]">
+      <button
+        title="Go to domain settings = ] "
+        id="settings"
+        class="self-start rounded outline-none hover:bg-hab-300 focus-visible:bg-hab-300"
+      >
         <svg
-          class="rounded fill-hab-900 p-0.5 hover:bg-hab-300"
-          id="settings"
+          class="fill-hab-900 p-0.5"
           width="32"
           height="32"
           viewBox="0 0 32 32"
@@ -72,16 +77,19 @@
           19.17 8.04794 18.9476 8.16124 18.6811C8.27455 18.4146 8.29798 18.1184
           8.22801 17.8373Z"" />
         </svg>
-      </div>
+      </button>
     </div>
 
     <div class="settings-container hidden">
-      <div class="back-button" title="Go Back [">
+      <button
+        class="back-button outline-none focus-visible:bg-hab-300"
+        title="Go Back = [ "
+      >
         <span class="back-arrow"></span>
-      </div>
-      <h2>Domains</h2>
+      </button>
+      <h2 class="pl-1">Domains</h2>
       <ol id="domains"></ol>
-      <div id="add-domain">+ Add new</div>
+      <button class="new-button" id="add-domain">New +</button>
     </div>
 
     <p class="mx-6 mt-16 mb-3 text-center text-5xl font-bold">Focus!</p>

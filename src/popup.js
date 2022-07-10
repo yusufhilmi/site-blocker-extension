@@ -19,7 +19,7 @@ const editHabit = (e) => {
     return;
   }
   habit.title = e.target.textContent;
-  console.log("from edit target text content:", e.target);
+  // console.log("from edit target text content:", e.target);
   // sync storage
   // chrome.storage.sync.set({ habits: habits });
 };
@@ -48,7 +48,7 @@ const handleDeleteDomain = (el, id) => {
 const deleteHabit = (el) => {
   const habitId = Number(el.getAttribute("data-for").substring(5));
   const habit = habits.find((habit) => habit.id === habitId);
-  console.log(habit, habitId, el);
+  // console.log(habit, habitId, el);
   // get the index and cut it out from the habits array
   let index = habits.findIndex((habit) => habit.id === habitId);
   habits.splice(index, 1);
@@ -62,7 +62,7 @@ const deleteHabit = (el) => {
   el.parentElement.previousElementSibling?.children[1].focus();
   let selection = document.getSelection();
   selection.collapse(selection.focusNode, selection.focusNode.length);
-  console.log(selection);
+  // console.log(selection);
   // document.getSelection().collapse(this.target, pos)
   // if (habitsList.children.length === 1) showAddNewHabitButton();
   el.parentElement.remove();
@@ -83,7 +83,7 @@ const addHabit = (id, habit, isNew = false) => {
     habits.push(habit);
     // chrome.storage.sync.set({ habits: habits });
     newHabitListItem.children[1].focus();
-    console.log("Habit after add: ", habits);
+    // console.log("Habit after add: ", habits);
   }
 
   // add toggle listener
@@ -115,7 +115,7 @@ const addDomain = (domain, isNew = false) => {
   if (isNew) {
     domains.push(domain);
     domainListItem.children[0].focus();
-    console.log("New Domain Added: ", domains);
+    // console.log("New Domain Added: ", domains);
   }
 };
 
@@ -135,7 +135,7 @@ const deleteDomain = (el, id) => {
   domains.splice(domainIndex, 1);
   // sync storage
   // chrome.storage.sync.set({ domains: domains });
-  console.log(domains);
+  // console.log(domains);
 
   // will come into play with the keyboard shortcuts and tricks
   // el.previousElementSibling.removeEventListener("blur", (e) =>
@@ -232,7 +232,7 @@ backButton.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (e) => {
-  console.log(domains);
+  // console.log(domains);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
       e.preventDefault();
@@ -265,7 +265,7 @@ window.addEventListener("keydown", (e) => {
 
       // check the checkbox with cmd+enter combination
       if (e.metaKey || e.ctrlKey) {
-        console.log(e.target.previousElementSibling);
+        // console.log(e.target.previousElementSibling);
         let inp = e.target.previousElementSibling;
         if (inp.checked) {
           inp.checked = false;

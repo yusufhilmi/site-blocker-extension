@@ -18,13 +18,17 @@ h2 {
   @apply text-xl font-semibold;
 }
 
+.new-button {
+  @apply -ml-1 mt-2 rounded-md px-2 py-1 text-hab-600 outline-none transition duration-150 ease-in-out hover:bg-hab-300 focus-visible:bg-hab-300;
+}
+
 /* todo items */
 #habits > li {
   @apply flex items-center gap-2 p-1;
 }
 
 .habitToggle {
-  @apply h-4 w-4;
+  @apply h-4 w-4 outline-1 outline-blue-400;
 }
 
 [contenteditable="true"] {
@@ -53,5 +57,5 @@ h2 {
 }
 
 #domains > li {
-  @apply flex items-center justify-between;
+  @apply flex items-center justify-between p-1;
 }
