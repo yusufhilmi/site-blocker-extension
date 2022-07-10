@@ -258,7 +258,7 @@ window.addEventListener("keydown", (e) => {
 
   if (e.code === "Enter") {
     // if one of the todos contenteditables are focused
-    //  when 'Enter' is pressed create a new todo underneath
+    //  when caret is at the end and 'Enter' is pressed, create a new todo underneath
     if (document.activeElement.hasAttribute("data-habit")) {
       // disable new line by enter
       e.preventDefault();
@@ -298,8 +298,9 @@ window.addEventListener("keydown", (e) => {
 
   if (document.activeElement === document.body && e.code === "KeyN") {
     e.preventDefault();
-    habit.id = 0;
-    addHabit(0, habit, true);
+    let id = getNewId(habits);
+    habit.id = id;
+    addHabit(id, habit, true);
   }
 
   if (e.code === "Escape") {
