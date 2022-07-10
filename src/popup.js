@@ -11,25 +11,12 @@ const handleToggle = (el, habit) => {
   });
 };
 
-const editHabit = (e) => {
-  const habitId = Number(e.target.getAttribute("data-for").substring(5));
-  const habit = habits.find((habit) => habit.id === habitId);
-  if (!e.target.textContent) {
-    deleteHabit(e.target);
-    return;
-  }
-  habit.title = e.target.textContent;
-  // console.log("from edit target text content:", e.target);
-  // sync storage
-  // chrome.storage.sync.set({ habits: habits });
-};
-
 const handleEditHabit = (el) => {
   el.addEventListener("blur", editHabit);
 };
 
-const handleEditDomain = (el, id) => {
-  el.addEventListener("blur", (e) => editDomain(e, id));
+const handleEditDomain = (el) => {
+  el.addEventListener("blur", editDomain);
 };
 
 // there is a hidden bug in these indexes, it will change when in use
@@ -37,17 +24,8 @@ const handleDeleteDomain = (el, id) => {
   el.addEventListener("click", (e) => deleteDomain(el, id));
 };
 
-// TODO: not sure if add new button should always be there or not
-// const showAddNewHabitButton = () => {
-//   console.log("show the add new button now");
-// };
-// const hideAddNewHabitButton = () => {
-//   console.log("hide the add new button now");
-// };
-
 const deleteHabit = (el) => {
-  const habitId = Number(el.getAttribute("data-for").substring(5));
-  const habit = habits.find((habit) => habit.id === habitId);
+  const habitId = Number(el.getAttribute("data-habit"));
   // console.log(habit, habitId, el);
   // get the index and cut it out from the habits array
   let index = habits.findIndex((habit) => habit.id === habitId);
@@ -59,12 +37,8 @@ const deleteHabit = (el) => {
   el.removeEventListener("blur", editHabit);
 
   // focus on previous parents previous sibling
-  el.parentElement.previousElementSibling?.children[1].focus();
-  let selection = document.getSelection();
-  selection.collapse(selection.focusNode, selection.focusNode.length);
-  // console.log(selection);
-  // document.getSelection().collapse(this.target, pos)
-  // if (habitsList.children.length === 1) showAddNewHabitButton();
+  focusOnPrevious(el);
+
   el.parentElement.remove();
 };
 
@@ -93,6 +67,19 @@ const addHabit = (id, habit, isNew = false) => {
   handleEditHabit(newHabitListItem.children[1]);
 };
 
+const editHabit = (e) => {
+  const habitId = Number(e.target.getAttribute("data-for").substring(5));
+  const habit = habits.find((habit) => habit.id === habitId);
+  if (!e.target.textContent) {
+    deleteHabit(e.target);
+    return;
+  }
+  habit.title = e.target.textContent;
+  // console.log("from edit target text content:", e.target);
+  // sync storage
+  // chrome.storage.sync.set({ habits: habits });
+};
+
 const addDomain = (domain, isNew = false) => {
   let newHost = "e.g. instagram or netflix.com";
 
@@ -107,7 +94,7 @@ const addDomain = (domain, isNew = false) => {
   domainsList.append(domainListItem);
 
   // handle edits
-  handleEditDomain(domainListItem.children[0], domain.id);
+  handleEditDomain(domainListItem.children[0]);
 
   // handle delete
   handleDeleteDomain(domainListItem.children[1], domain.id);
@@ -119,9 +106,14 @@ const addDomain = (domain, isNew = false) => {
   }
 };
 
-const editDomain = (e, id) => {
-  // if (e.target.textContent === "") el.remove();
+const editDomain = (e) => {
+  const id = Number(e.target.getAttribute("data-domain"));
   const domain = domains.find((domain) => domain.id === id);
+
+  if (!e.target.textContent) {
+    deleteDomain(e.target, id);
+    return;
+  }
 
   domain.host = e.target.textContent;
 
@@ -138,9 +130,7 @@ const deleteDomain = (el, id) => {
   // console.log(domains);
 
   // will come into play with the keyboard shortcuts and tricks
-  // el.previousElementSibling.removeEventListener("blur", (e) =>
-  //   editDomain(e, id)
-  // );
+  el.removeEventListener("blur", editDomain);
   el.parentElement.remove();
 };
 
@@ -152,6 +142,12 @@ const getNewId = (arr) => {
   } else {
     return 0;
   }
+};
+
+const focusOnPrevious = (el) => {
+  el.parentElement.previousElementSibling?.children[1].focus();
+  let selection = document.getSelection();
+  selection.collapse(selection.focusNode, selection.focusNode.length);
 };
 
 const domainsList = document.getElementById("domains");
@@ -232,7 +228,7 @@ backButton.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (e) => {
-  // console.log(domains);
+  console.log(domains);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
       e.preventDefault();
@@ -284,19 +280,34 @@ window.addEventListener("keydown", (e) => {
         addHabit(habit.id, habit, true);
       }
     }
+    if (document.activeElement.hasAttribute("data-domain")) {
+      e.preventDefault();
+      if (
+        selection.focusNode?.nodeType === 3 &&
+        selection.focusOffset === selection.focusNode.length
+      ) {
+        let domain = { id: getNewId(domains), host: "" };
+        addDomain(domain, true);
+      }
+    }
   }
 
+  let isHabit = document.activeElement.getAttribute("data-habit");
+
   if (e.code === "Backspace") {
-    let isHabit = document.activeElement.getAttribute("data-habit");
     let isDomain = document.activeElement.getAttribute("data-domain");
     if ((isHabit || isDomain) && selection.focusNode?.nodeType === 1) {
       e.preventDefault();
       isHabit ? deleteHabit(e.target) : null;
-      // isDomain ? deleteDomain(e.target, Number(isDomain)) : null;
+      isDomain ? deleteDomain(e.target, Number(isDomain)) : null;
     }
   }
 
-  if (document.activeElement === document.body && e.code === "KeyN") {
+  if (
+    !isSettingsOpen &&
+    document.activeElement === document.body &&
+    e.code === "KeyN"
+  ) {
     e.preventDefault();
     let id = getNewId(habits);
     habit.id = id;
@@ -309,19 +320,23 @@ window.addEventListener("keydown", (e) => {
 
   // watch out this part for domains
   if (e.code === "ArrowUp") {
-    document.activeElement.parentElement?.previousElementSibling?.children[1]?.focus();
+    isHabit
+      ? document.activeElement.parentElement?.previousElementSibling?.children[1]?.focus()
+      : document.activeElement.parentElement?.previousElementSibling?.children[0]?.focus();
   }
 
   if (e.code === "ArrowDown") {
-    document.activeElement.parentElement?.nextElementSibling?.children[1]?.focus();
+    isHabit
+      ? document.activeElement.parentElement?.nextElementSibling?.children[1]?.focus()
+      : document.activeElement.parentElement?.nextElementSibling?.children[0]?.focus();
   }
 });
 
 /* TODO:
 [x] clear ui, delete X button.
 [x]focus on previous habit after delete
-[] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
-
+[x] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
+[] give a setting for choosing redirect
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
 */
