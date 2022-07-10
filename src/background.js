@@ -4,27 +4,29 @@ chrome.runtime.onInstalled.addListener(async () => {
   let tab = await chrome.tabs.create({ url });
   console.log(`Created tab ${tab.id}`);
 
-  // get the domains
-  const json = await fetch(chrome.runtime.getURL("domains.json")).then(
-    (response) => response.json()
-  );
-
-  const domains = json.domains;
-
-  // add them to storage to block 'em
-  chrome.storage.sync.set({ domains }, () => {
-    console.log("domains below are blocked", domains);
+  let domains, habits;
+  chrome.storage.sync.get(["domains", "habits"], (res) => {
+    if (!res.domains) {
+      // set as default if there wasn't a setting prev.
+      domains = [
+        { id: 0, host: "netflix.com" },
+        { id: 1, host: "instagram.com" },
+      ];
+    }
+    if (!res.habits) {
+      // set as default if there wasn't a setting prev.
+      habits = [
+        {
+          id: 0,
+          title: "Read Book",
+          completed: false,
+        },
+      ];
+    }
   });
 
-  const defaultHabit = {
-    id: 1,
-    title: "Read Book for 30 min",
-    completed: false,
-  };
-
-  chrome.storage.sync.set({ habits: [defaultHabit] }, () => {
-    console.log("default habit added", defaultHabit);
-  });
+  // add them to storage to block 'ems
+  chrome.storage.sync.set({ domains, habits });
 });
 
 // a helper to track storage changes
@@ -43,3 +45,7 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
     url: chrome.runtime.getURL("blocked-page.html"),
   });
 });
+
+// TODO:
+// [x] integrate js state with store
+// [] handle bypass mechanism

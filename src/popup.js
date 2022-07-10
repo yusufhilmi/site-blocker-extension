@@ -7,7 +7,7 @@ const handleToggle = (el, habit) => {
     }
 
     // sync storage
-    // chrome.storage.sync.set({ habits: habits });
+    chrome.storage.sync.set({ habits });
   });
 };
 
@@ -31,7 +31,7 @@ const deleteHabit = (el) => {
   habits.splice(index, 1);
 
   // sync it with storage
-  // chrome.storage.sync.set({ habits: habits });
+  chrome.storage.sync.set({ habits });
 
   el.removeEventListener("blur", editHabit);
 
@@ -65,11 +65,10 @@ const addHabit = (habit = {}, isNew = false) => {
     isNew ? "data-placeholder=To-do" : ""
   } data-habit=${habit.id} ">${isNew ? "" : habit.title}</span>`;
 
-  // if (habitsList.children.length === 0) hideAddNewHabitButton()
   habitsList.appendChild(newHabitListItem);
   if (isNew) {
     habits.push(habit);
-    // chrome.storage.sync.set({ habits: habits });
+    chrome.storage.sync.set({ habits });
     newHabitListItem.children[1].focus();
   }
 
@@ -89,7 +88,7 @@ const editHabit = (e) => {
   }
   habit.title = e.target.textContent;
   // sync storage
-  // chrome.storage.sync.set({ habits: habits });
+  chrome.storage.sync.set({ habits });
 };
 
 const addDomain = (domain, isNew = false) => {
@@ -114,6 +113,7 @@ const addDomain = (domain, isNew = false) => {
   if (isNew) {
     domains.push(domain);
     domainListItem.children[0].focus();
+    chrome.storage.sync.set({ domains });
   }
 };
 
@@ -129,14 +129,14 @@ const editDomain = (e) => {
   domain.host = e.target.textContent;
 
   // sync storage
-  // chrome.storage.sync.set({ domains: domains });
+  chrome.storage.sync.set({ domains });
 };
 
 const deleteDomain = (el, id) => {
   const domainIndex = domains.findIndex((domain) => domain.id === id);
   domains.splice(domainIndex, 1);
   // sync storage
-  // chrome.storage.sync.set({ domains: domains });
+  chrome.storage.sync.set({ domains });
 
   // will come into play with the keyboard shortcuts and tricks
   el.removeEventListener("blur", editDomain);
@@ -165,32 +165,21 @@ let habits = [];
 let domains = [];
 
 const loadHabits = () => {
-  // chrome.storage.sync.get(["habits"], (res) => {
-  // habits = res.habits;
-  habits = [
-    {
-      id: 1,
-      title: "Read Book for 30 min",
-      completed: false,
-    },
-  ];
-
-  habits.forEach((habit) => {
-    addHabit(habit);
+  chrome.storage.sync.get(["habits"], (res) => {
+    habits = res.habits;
+    habits.forEach((habit) => {
+      addHabit(habit);
+    });
   });
-  // }); // end of habits storage sync
 };
 
 const loadDomains = () => {
-  domains = [
-    { id: 1, host: "youtube.com" },
-    { id: 2, host: "instagram.com" },
-    { id: 3, host: "netflix.com" },
-    { id: 4, host: "dizibox" },
-  ];
-
-  domains.forEach((domain) => {
-    addDomain(domain);
+  chrome.storage.sync.get(["domains"], (res) => {
+    domains = res.domains;
+    console.log(domains);
+    domains.forEach((domain) => {
+      addDomain(domain);
+    });
   });
 };
 
@@ -308,6 +297,7 @@ window.addEventListener("keydown", (e) => {
     }
   } else {
     if (e.code === "BracketRight") {
+      if (location.href.split("/").slice(-1)[0] === "blocked-page.html") return;
       e.preventDefault();
       openSettings();
     }
@@ -330,6 +320,9 @@ window.addEventListener("keydown", (e) => {
         } else {
           inp.checked = true;
         }
+        // dispatch the event
+        var event = new Event("change");
+        inp.dispatchEvent(event);
         return;
       }
 

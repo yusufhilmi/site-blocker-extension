@@ -9,14 +9,13 @@ let domains;
 // get the hostname
 const hostname = window.location.hostname;
 
-// TODO: switch to id based domain state
 chrome.storage.sync.get(["domains"], (res) => {
   domains = res.domains;
 
   console.log("domains that are going to be blocked: ", domains);
 
   domains.forEach((domain) => {
-    if (hostname.includes(domain)) {
+    if (hostname.includes(domain.host)) {
       chrome.runtime.sendMessage({ redirect: "https://google.com" });
     }
   });
