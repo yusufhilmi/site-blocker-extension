@@ -19,7 +19,7 @@ h2 {
 }
 
 /* todo items */
-li {
+#habits > li {
   @apply flex items-center gap-2 p-1;
 }
 
@@ -50,4 +50,8 @@ li {
 
 .back-arrow {
   @apply ml-1 inline-block h-2  w-2 -rotate-45 border-t border-l border-hab-900;
+}
+
+#domains > li {
+  @apply flex items-center justify-between;
 }

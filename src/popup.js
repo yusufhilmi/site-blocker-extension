@@ -29,28 +29,12 @@ const handleEditHabit = (el) => {
 };
 
 const handleEditDomain = (el, id) => {
-  el.addEventListener("blur", (e) => {
-    // if (e.target.textContent === "") el.remove();
-    const domain = domains.find((domain) => domain.id === id);
-
-    domain.host = e.target.textContent;
-
-    console.log(domains);
-    // sync storage
-    // chrome.storage.sync.set({ domains: domains });
-  });
+  el.addEventListener("blur", (e) => editDomain(e, id));
 };
 
 // there is a hidden bug in these indexes, it will change when in use
 const handleDeleteDomain = (el, id) => {
-  el.addEventListener("click", (e) => {
-    const domainIndex = domains.findIndex((domain) => domain.id === id);
-    domains.splice(domainIndex, 1);
-    // sync storage
-    // chrome.storage.sync.set({ domains: domains });
-    console.log(domains);
-    el.parentElement.remove();
-  });
+  el.addEventListener("click", (e) => deleteDomain(el, id));
 };
 
 // TODO: not sure if add new button should always be there or not
@@ -109,7 +93,66 @@ const addHabit = (id, habit, isNew = false) => {
   handleEditHabit(newHabitListItem.children[1]);
 };
 
-const addDomain = () => {};
+const addDomain = (domain, isNew = false) => {
+  let newHost = "e.g. instagram or netflix.com";
+
+  let domainListItem = document.createElement("li");
+  domainListItem.innerHTML = `
+  <span contenteditable="true" data-domain=${domain.id} ${
+    isNew ? "data-placeholder='" + newHost + "'" : ""
+  }>${
+    isNew ? "" : domain.host
+  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-200"><img src="./trash-can.svg"/></button>
+`;
+  domainsList.append(domainListItem);
+
+  // handle edits
+  handleEditDomain(domainListItem.children[0], domain.id);
+
+  // handle delete
+  handleDeleteDomain(domainListItem.children[1], domain.id);
+
+  if (isNew) {
+    domains.push(domain);
+    domainListItem.children[0].focus();
+    console.log("New Domain Added: ", domains);
+  }
+};
+
+const editDomain = (e, id) => {
+  // if (e.target.textContent === "") el.remove();
+  const domain = domains.find((domain) => domain.id === id);
+
+  domain.host = e.target.textContent;
+
+  console.log(domains);
+  // sync storage
+  // chrome.storage.sync.set({ domains: domains });
+};
+
+const deleteDomain = (el, id) => {
+  const domainIndex = domains.findIndex((domain) => domain.id === id);
+  domains.splice(domainIndex, 1);
+  // sync storage
+  // chrome.storage.sync.set({ domains: domains });
+  console.log(domains);
+
+  // will come into play with the keyboard shortcuts and tricks
+  // el.previousElementSibling.removeEventListener("blur", (e) =>
+  //   editDomain(e, id)
+  // );
+  el.parentElement.remove();
+};
+
+// const getLastId = (arr) => {
+//   // array of objects with ID { id: 0, ...}
+//   if (arr[arr.length - 1]) {
+//     // this op is ok since it is ordered but be careful
+//     return arr[arr.length - 1].id + 1;
+//   } else {
+//     return 0;
+//   }
+// };
 
 const domainsList = document.getElementById("domains");
 const habitsList = document.getElementById("habits");
@@ -139,18 +182,8 @@ window.addEventListener("DOMContentLoaded", () => {
     { id: 4, host: "dizibox" },
   ];
 
-  domains.forEach((domain, i) => {
-    let domainListItem = document.createElement("li");
-    domainListItem.innerHTML = `
-    <span contenteditable="true">${domain.host}</span> <span class="delete">X</span>
-  `;
-    domainsList.append(domainListItem);
-
-    // handle edits
-    handleEditDomain(domainListItem.children[0], domain.id);
-
-    // handle delete
-    handleDeleteDomain(domainListItem.children[1], domain.id);
+  domains.forEach((domain) => {
+    addDomain(domain);
   });
 });
 
@@ -178,7 +211,6 @@ const addDomainButton = document.querySelector("#add-domain");
 
 // add new domain to block
 addDomainButton.addEventListener("click", () => {
-  let newHost = "ie. instagram or netflix.com";
   let id;
   if (domains[domains.length - 1]) {
     // this op is ok since it is ordered but be careful
@@ -186,22 +218,7 @@ addDomainButton.addEventListener("click", () => {
   } else {
     id = 0;
   }
-  let newDomainListItem = document.createElement("li");
-  newDomainListItem.innerHTML = `
-  <span contenteditable="true" data-placeholder="${newHost}"></span> <span class="delete">X</span>
-  `;
-
-  domains.push({ id: id, host: "" });
-  domainsList.appendChild(newDomainListItem);
-  newDomainListItem.children[0].focus();
-
-  console.log("New Domain Added: ", domains);
-
-  // handle edits
-  handleEditDomain(newDomainListItem.children[0], id);
-
-  // handle delete
-  handleDeleteDomain(newDomainListItem.children[1], id);
+  addDomain({ id: id, host: "" }, true);
 });
 
 let isSettingsOpen = false;
@@ -227,15 +244,17 @@ backButton.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (e) => {
-  console.log(habits);
+  console.log(domains);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
+      e.preventDefault();
       settingsContainer.classList.add("hidden");
       mainContainer.classList.remove("hidden");
       isSettingsOpen = false;
     }
   } else {
     if (e.code === "BracketRight") {
+      e.preventDefault();
       settingsContainer.classList.remove("hidden");
       mainContainer.classList.add("hidden");
       isSettingsOpen = true;
@@ -256,6 +275,7 @@ window.addEventListener("keydown", (e) => {
       // disable new line by enter
       e.preventDefault();
 
+      // check the checkbox with cmd+enter combination
       if (e.metaKey || e.ctrlKey) {
         console.log(e.target.previousElementSibling);
         let inp = e.target.previousElementSibling;
@@ -284,19 +304,17 @@ window.addEventListener("keydown", (e) => {
         // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
         habit.id = maxIndex + 1;
         addHabit(habit.id, habit, true);
-
-        console.log();
-        console.log("Enter has been pressed while editing todos");
-        console.log(habits);
       }
     }
   }
 
   if (e.code === "Backspace") {
-    let id = document.activeElement.getAttribute("data-habit");
-    if (id && selection.focusNode?.nodeType === 1) {
+    let isHabit = document.activeElement.getAttribute("data-habit");
+    let isDomain = document.activeElement.getAttribute("data-domain");
+    if ((isHabit || isDomain) && selection.focusNode?.nodeType === 1) {
       e.preventDefault();
-      deleteHabit(e.target);
+      isHabit ? deleteHabit(e.target) : null;
+      // isDomain ? deleteDomain(e.target, Number(isDomain)) : null;
     }
   }
 
@@ -304,6 +322,19 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
     habit.id = 0;
     addHabit(0, habit, true);
+  }
+
+  if (e.code === "Escape") {
+    document.activeElement.blur();
+  }
+
+  // watch out this part for domains
+  if (e.code === "ArrowUp") {
+    document.activeElement.parentElement?.previousElementSibling?.children[1]?.focus();
+  }
+
+  if (e.code === "ArrowDown") {
+    document.activeElement.parentElement?.nextElementSibling?.children[1]?.focus();
   }
 });
 
