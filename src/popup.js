@@ -144,15 +144,15 @@ const deleteDomain = (el, id) => {
   el.parentElement.remove();
 };
 
-// const getLastId = (arr) => {
-//   // array of objects with ID { id: 0, ...}
-//   if (arr[arr.length - 1]) {
-//     // this op is ok since it is ordered but be careful
-//     return arr[arr.length - 1].id + 1;
-//   } else {
-//     return 0;
-//   }
-// };
+const getNewId = (arr) => {
+  // array of objects with ID { id: 0, ...}
+  if (arr[arr.length - 1]) {
+    // this op is ok since it is ordered but be careful
+    return arr[arr.length - 1].id + 1;
+  } else {
+    return 0;
+  }
+};
 
 const domainsList = document.getElementById("domains");
 const habitsList = document.getElementById("habits");
@@ -191,13 +191,7 @@ const addHabitButton = document.getElementById("add-habit");
 
 // add habit
 addHabitButton.addEventListener("click", () => {
-  let id;
-  if (habits[habits.length - 1]) {
-    // this op is ok since it is ordered but be careful
-    id = habits[habits.length - 1].id + 1;
-  } else {
-    id = 0;
-  }
+  let id = getNewId(habits);
   let habit = {
     id: id,
     title: "To-do",
@@ -211,13 +205,7 @@ const addDomainButton = document.querySelector("#add-domain");
 
 // add new domain to block
 addDomainButton.addEventListener("click", () => {
-  let id;
-  if (domains[domains.length - 1]) {
-    // this op is ok since it is ordered but be careful
-    id = domains[domains.length - 1].id + 1;
-  } else {
-    id = 0;
-  }
+  let id = getNewId(domains);
   addDomain({ id: id, host: "" }, true);
 });
 
@@ -291,18 +279,8 @@ window.addEventListener("keydown", (e) => {
         selection.focusNode?.nodeType === 3 &&
         selection.focusOffset === selection.focusNode.length
       ) {
-        let maxIndex = 0;
-        // get habits, just insert to the bottom
-        habits.filter((habit, i) => {
-          if (habit.id >= maxIndex) {
-            maxIndex = habit.id;
-            return true;
-          }
-          return false;
-        });
-
         // irrelevant note: I have an urge to create my own framework 3 July 2022 11:56pm
-        habit.id = maxIndex + 1;
+        habit.id = getNewId(habits);
         addHabit(habit.id, habit, true);
       }
     }
