@@ -163,20 +163,16 @@ const domainsList = document.getElementById("domains");
 const habitsList = document.getElementById("habits");
 let habits = [];
 let domains = [];
+let customRedirectURL = null;
 
-const loadHabits = () => {
-  chrome.storage.sync.get(["habits"], (res) => {
+const getChromeStorage = () => {
+  chrome.storage.sync.get(["habits", "domains"], (res) => {
     habits = res.habits;
     habits.forEach((habit) => {
       addHabit(habit);
     });
-  });
-};
 
-const loadDomains = () => {
-  chrome.storage.sync.get(["domains"], (res) => {
     domains = res.domains;
-    console.log(domains);
     domains.forEach((domain) => {
       addDomain(domain);
     });
@@ -184,8 +180,7 @@ const loadDomains = () => {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  loadHabits();
-  loadDomains();
+  getChromeStorage();
 });
 
 const addHabitButton = document.getElementById("add-habit");
@@ -213,6 +208,7 @@ const mainContainer = document.querySelector(".main-container");
 const openSettings = () => {
   settingsContainer.classList.remove("hidden");
   mainContainer.classList.add("hidden");
+  getCustomRedirect();
   isSettingsOpen = true;
 };
 const closeSettings = () => {
@@ -245,6 +241,7 @@ const activateCustom = () => {
   defaultRedirectButton.setAttribute("data-active", false);
   customRedirectLinkInput.classList.remove("hidden");
   validateURL();
+  customRedirectLinkInput.focus();
 };
 
 const activateDefault = () => {
@@ -252,17 +249,33 @@ const activateDefault = () => {
   defaultRedirectButton.setAttribute("data-active", true);
   customRedirectLinkInput.classList.add("hidden");
   customRedirectLinkError.classList.add("hidden");
+  customRedirectLinkInput.value = "";
+  chrome.storage.sync.set({ customRedirect: null });
 };
 
-// read chrome storage here activate accoridingly.
+// read chrome storage, called in DOMContentLoaded
+const getCustomRedirect = () => {
+  chrome.storage.sync.get(["customRedirect"], (res) => {
+    customRedirectURL = res.customRedirect;
+    if (customRedirectURL) {
+      activateCustom();
+      customRedirectLinkInput.value = customRedirectURL;
+    } else {
+      activateDefault();
+    }
+  });
+};
 
 const validateURL = () => {
   let isValid = customRedirectLinkInput.checkValidity();
   if (!isValid) {
     customRedirectLinkError.classList.remove("hidden");
   } else {
+    let inputValue = customRedirectLinkInput.value;
+
     customRedirectLinkError.classList.add("hidden");
     // set chrome storage here
+    chrome.storage.sync.set({ customRedirect: inputValue });
   }
 };
 
@@ -387,6 +400,7 @@ window.addEventListener("keydown", (e) => {
 /* TODO:
 [] while closing the blocker for a domain take text input saying "I want to be lazy" or "I will be closer to my targets"
     point is get some text input, don't blame but increase awareness, set a timer boom ure in!
+[] add more friction to delete a domain
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
 */

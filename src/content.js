@@ -16,7 +16,7 @@ chrome.storage.sync.get(["domains"], (res) => {
 
   domains.forEach((domain) => {
     if (hostname.includes(domain.host)) {
-      chrome.runtime.sendMessage({ redirect: "https://google.com" });
+      chrome.runtime.sendMessage({ message: "blocked-page-opened" });
     }
   });
 });

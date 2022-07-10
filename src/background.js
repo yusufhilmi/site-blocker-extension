@@ -39,13 +39,21 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender) {
-  console.log(sender.tab.id);
-  console.log(request);
-  chrome.tabs.update(sender.tab.id, {
-    url: chrome.runtime.getURL("blocked-page.html"),
-  });
+  if (request.message === "blocked-page-opened") {
+    let redirectURL = chrome.runtime.getURL("blocked-page.html");
+    chrome.storage.sync.get(["customRedirect"], (res) => {
+      if (res.customRedirect) {
+        redirectURL = res.customRedirect;
+      }
+      chrome.tabs.update(sender.tab.id, {
+        url: redirectURL,
+      });
+      console.log("blocked", sender.tab.url);
+    });
+  }
 });
 
 // TODO:
 // [x] integrate js state with store
+// [x] custom redirect stuff
 // [] handle bypass mechanism
