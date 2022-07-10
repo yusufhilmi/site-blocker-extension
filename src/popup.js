@@ -89,7 +89,7 @@ const addDomain = (domain, isNew = false) => {
     isNew ? "data-placeholder='" + newHost + "'" : ""
   }>${
     isNew ? "" : domain.host
-  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-150"><img src="./trash-can.svg"/></button>
+  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-150"><img src="./trash-can.svg"/></button>
 `;
   domainsList.append(domainListItem);
 
@@ -395,10 +395,6 @@ window.addEventListener("keydown", (e) => {
 });
 
 /* TODO:
-[x] clear ui, delete X button.
-[x]focus on previous habit after delete
-[x] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
-[x] give a setting for choosing redirect
 [] while closing the blocker for a domain take text input saying "I want to be lazy" or "I will be closer to my targets"
     point is get some text input, don't blame but increase awareness, set a timer boom ure in!
 
