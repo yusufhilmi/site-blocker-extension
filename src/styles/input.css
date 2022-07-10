@@ -77,3 +77,15 @@ button[data-active="false"] {
 button[data-active="true"] {
   @apply bg-emerald-600 text-white;
 }
+
+/* blocked page */
+
+#blocked > #habits > li {
+  @apply flex items-center gap-2 p-2;
+}
+#blocked > #habits > li > .habitToggle {
+  @apply h-5 w-5 sm:h-6 sm:w-6;
+}
+#blocked > #habits > li > span {
+  @apply text-base sm:text-lg;
+}
