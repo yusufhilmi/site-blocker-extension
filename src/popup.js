@@ -89,7 +89,7 @@ const addDomain = (domain, isNew = false) => {
     isNew ? "data-placeholder='" + newHost + "'" : ""
   }>${
     isNew ? "" : domain.host
-  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-200"><img src="./trash-can.svg"/></button>
+  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-150"><img src="./trash-can.svg"/></button>
 `;
   domainsList.append(domainListItem);
 
@@ -205,43 +205,105 @@ addDomainButton.addEventListener("click", () => {
   addDomain({ id: id, host: "" }, true);
 });
 
+// handle settings internal nav
 let isSettingsOpen = false;
 const settingsButton = document.querySelector("#settings");
 const backButton = document.querySelector(".back-button");
 const settingsContainer = document.querySelector(".settings-container");
 const mainContainer = document.querySelector(".main-container");
 
+const openSettings = () => {
+  settingsContainer.classList.remove("hidden");
+  mainContainer.classList.add("hidden");
+  isSettingsOpen = true;
+};
+const closeSettings = () => {
+  settingsContainer.classList.add("hidden");
+  mainContainer.classList.remove("hidden");
+  isSettingsOpen = false;
+};
+
 settingsButton.addEventListener("click", () => {
   if (!isSettingsOpen) {
-    settingsContainer.classList.remove("hidden");
-    mainContainer.classList.add("hidden");
-    isSettingsOpen = true;
+    openSettings();
   }
 });
 
 backButton.addEventListener("click", () => {
   if (isSettingsOpen) {
-    settingsContainer.classList.add("hidden");
-    mainContainer.classList.remove("hidden");
-    isSettingsOpen = false;
+    closeSettings();
   }
 });
 
+// handle custom redirects
+const defaultRedirectButton = document.querySelector("#redirect-default");
+const customRedirectButton = document.querySelector("#redirect-custom");
+const customRedirectLinkInput = document.querySelector("#redirect-link");
+const customRedirectLinkError = document.querySelector("#redirect-link-error");
+
+// cant do simple toggle because input will be bound to custom
+const activateCustom = () => {
+  customRedirectButton.setAttribute("data-active", true);
+  defaultRedirectButton.setAttribute("data-active", false);
+  customRedirectLinkInput.classList.remove("hidden");
+  validateURL();
+};
+
+const activateDefault = () => {
+  customRedirectButton.setAttribute("data-active", false);
+  defaultRedirectButton.setAttribute("data-active", true);
+  customRedirectLinkInput.classList.add("hidden");
+  customRedirectLinkError.classList.add("hidden");
+};
+
+// read chrome storage here activate accoridingly.
+
+const validateURL = () => {
+  let isValid = customRedirectLinkInput.checkValidity();
+  if (!isValid) {
+    customRedirectLinkError.classList.remove("hidden");
+  } else {
+    customRedirectLinkError.classList.add("hidden");
+    // set chrome storage here
+  }
+};
+
+customRedirectButton.addEventListener("click", (e) => {
+  console.log("clicked custom");
+  isActive = e.target.getAttribute("data-active");
+  if (isActive === "true") {
+    activateDefault();
+  } else if (isActive === "false") {
+    activateCustom();
+  }
+});
+
+defaultRedirectButton.addEventListener("click", (e) => {
+  console.log("clicked default");
+  isActive = e.target.getAttribute("data-active");
+  if (isActive === "true") {
+    activateCustom();
+  } else if (isActive === "false") {
+    activateDefault();
+  }
+});
+
+customRedirectLinkInput.addEventListener("blur", (e) => {
+  validateURL();
+});
+
+// handle keyboard events
 window.addEventListener("keydown", (e) => {
   console.log(domains);
   if (isSettingsOpen) {
     if (e.code === "BracketLeft") {
       e.preventDefault();
-      settingsContainer.classList.add("hidden");
-      mainContainer.classList.remove("hidden");
-      isSettingsOpen = false;
+      closeSettings();
     }
   } else {
     if (e.code === "BracketRight") {
       e.preventDefault();
-      settingsContainer.classList.remove("hidden");
-      mainContainer.classList.add("hidden");
-      isSettingsOpen = true;
+      openSettings();
     }
   }
 
@@ -336,7 +398,9 @@ window.addEventListener("keydown", (e) => {
 [x] clear ui, delete X button.
 [x]focus on previous habit after delete
 [x] apply same edits to domain (Enter -> new domain, backspace -> delete, N -> new domain)
-[] give a setting for choosing redirect
+[x] give a setting for choosing redirect
+[] while closing the blocker for a domain take text input saying "I want to be lazy" or "I will be closer to my targets"
+    point is get some text input, don't blame but increase awareness, set a timer boom ure in!
 
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
 */
