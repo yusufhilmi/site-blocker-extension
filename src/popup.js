@@ -441,9 +441,8 @@ if (location.href.split("/").slice(-1)[0] === "blocked-page.html") {
   options = Array.from(bypassOptions.children);
   options.forEach((option) => {
     option.addEventListener("click", (e) => {
-      let isActive = toggleDataActiveButton(e); // TODO: add friction here as well ,lets be an annoying prick
-      // let interval = Number(e.target.getAttribute("data-time"));
-      let interval = 1;
+      let isActive = toggleDataActiveButton(e);
+      let interval = Number(e.target.getAttribute("data-time"));
       let until = new Date();
       until.setMinutes(until.getMinutes() + interval);
       if (isActive) {
