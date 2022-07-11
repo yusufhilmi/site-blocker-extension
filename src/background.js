@@ -5,6 +5,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   console.log(`Created tab ${tab.id}`);
 
   let domains, habits;
+  let bypassUntil = new Date();
   chrome.storage.sync.get(["domains", "habits"], (res) => {
     if (!res.domains) {
       // set as default if there wasn't a setting prev.
@@ -23,10 +24,13 @@ chrome.runtime.onInstalled.addListener(async () => {
         },
       ];
     }
+    // add them to storage to block 'ems
+    chrome.storage.sync.set({
+      domains,
+      habits,
+      bypassUntil: bypassUntil.toISOString(),
+    });
   });
-
-  // add them to storage to block 'ems
-  chrome.storage.sync.set({ domains, habits });
 });
 
 // a helper to track storage changes
@@ -47,6 +51,9 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
       }
 
       let until = new Date(res.bypassUntil);
+      // console.log(res.bypassUntil);
+      // console.log(until);
+
       if (new Date() > until) {
         chrome.tabs.update(sender.tab.id, {
           url: redirectURL,
@@ -82,7 +89,7 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
 });
 
 // TODO:
-// [] handle bypass mechanism
+// [x] handle bypass mechanism
 /*
 get the bypass time and interval for shutdown
 
