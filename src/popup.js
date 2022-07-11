@@ -172,7 +172,7 @@ let domains = [];
 let customRedirectURL = null;
 
 const getChromeStorage = () => {
-  chrome.storage.sync.get(["habits", "domains"], (res) => {
+  chrome.storage.sync.get(["habits", "domains", "bypassUntil"], (res) => {
     habits = res.habits;
     habits.forEach((habit) => {
       addHabit(habit);
@@ -182,6 +182,11 @@ const getChromeStorage = () => {
     domains.forEach((domain) => {
       addDomain(domain);
     });
+
+    let until = new Date(res.bypassUntil);
+    if (new Date() < until) {
+      bypassButton.classList.add("hidden");
+    }
   });
 };
 
@@ -408,8 +413,6 @@ It was fun to try building with bare js,html,css it was also helpful to learn wh
 */
 
 // bypass mechanism
-// let's keep it only for default page for now, this is the worst way you can do this tbh
-
 const toggleDataActiveButton = (e) => {
   if (e.target.hasAttribute("data-active")) {
     const isActive = e.target.getAttribute("data-active");
@@ -421,38 +424,35 @@ const toggleDataActiveButton = (e) => {
       return true;
     }
   } else {
-    console.log("toggling wrong button");
+    console.error("toggling wrong button");
   }
 };
 
-if (location.href.split("/").slice(-1)[0] === "blocked-page.html") {
-  const bypassButton = document.querySelector("#bypass-button");
-  const bypassOptions = document.querySelector("#bypass-options");
+const bypassButton = document.querySelector("#bypass-button");
+const bypassOptions = document.querySelector("#bypass-options");
 
-  // friction level 1
-  bypassButton.addEventListener("click", (e) => {
+// friction level 1
+bypassButton.addEventListener("click", (e) => {
+  let isActive = toggleDataActiveButton(e);
+  isActive
+    ? bypassOptions.classList.remove("hidden")
+    : bypassOptions.classList.add("hidden");
+});
+
+options = Array.from(bypassOptions.children);
+options.forEach((option) => {
+  option.addEventListener("click", (e) => {
     let isActive = toggleDataActiveButton(e);
-    isActive
-      ? bypassOptions.classList.remove("hidden")
-      : bypassOptions.classList.add("hidden");
-  });
-
-  console.log(bypassOptions.children);
-  options = Array.from(bypassOptions.children);
-  options.forEach((option) => {
-    option.addEventListener("click", (e) => {
-      let isActive = toggleDataActiveButton(e);
-      let interval = Number(e.target.getAttribute("data-time"));
-      let until = new Date();
-      until.setMinutes(until.getMinutes() + interval);
-      if (isActive) {
-        let sure = prompt(
-          "Are you sure you want to go in there? \n Write I AM SURE THAT WILL BE A GOOD CHOICE"
-        );
-        if (sure === "I AM SURE THAT WILL BE A GOOD CHOICE") {
-          chrome.runtime.sendMessage({ message: "let-in", until: until });
-        }
+    let interval = Number(e.target.getAttribute("data-time"));
+    let until = new Date();
+    until.setMinutes(until.getMinutes() + interval);
+    if (isActive) {
+      let sure = prompt(
+        "Are you sure you want to go in there? \n Write I AM SURE THAT WILL BE A GOOD CHOICE"
+      );
+      if (sure === "I AM SURE THAT WILL BE A GOOD CHOICE") {
+        chrome.runtime.sendMessage({ message: "let-in", until: until });
       }
-    });
+    }
   });
-}
+});

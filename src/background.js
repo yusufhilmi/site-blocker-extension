@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
     chrome.storage.sync.set({ bypassUntil: request.until });
 
     chrome.storage.sync.get(["lastBlocked"], (res) => {
-      if (res.lastBlocked.tabId === sender.tab.id) {
+      if (res.lastBlocked?.tabId === sender.tab.id) {
         setTimeout(() => {
           // console.log("will redirect you in 2 seconds");
           chrome.tabs.update(sender.tab.id, {
