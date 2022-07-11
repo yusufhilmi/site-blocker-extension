@@ -403,10 +403,57 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-/* TODO:
-[] while closing the blocker for a domain take text input saying "I want to be lazy" or "I will be closer to my targets"
-    point is get some text input, don't blame but increase awareness, set a timer boom ure in!
-[x] add more friction to delete a domain
-
+/*
 It was fun to try building with bare js,html,css it was also helpful to learn what goes into a web framework like React.
 */
+
+// bypass mechanism
+// let's keep it only for default page for now, this is the worst way you can do this tbh
+
+const toggleDataActiveButton = (e) => {
+  if (e.target.hasAttribute("data-active")) {
+    const isActive = e.target.getAttribute("data-active");
+    if (isActive === "true") {
+      e.target.setAttribute("data-active", false);
+      return false;
+    } else {
+      e.target.setAttribute("data-active", true);
+      return true;
+    }
+  } else {
+    console.log("toggling wrong button");
+  }
+};
+
+if (location.href.split("/").slice(-1)[0] === "blocked-page.html") {
+  const bypassButton = document.querySelector("#bypass-button");
+  const bypassOptions = document.querySelector("#bypass-options");
+
+  // friction level 1
+  bypassButton.addEventListener("click", (e) => {
+    let isActive = toggleDataActiveButton(e);
+    isActive
+      ? bypassOptions.classList.remove("hidden")
+      : bypassOptions.classList.add("hidden");
+  });
+
+  console.log(bypassOptions.children);
+  options = Array.from(bypassOptions.children);
+  options.forEach((option) => {
+    option.addEventListener("click", (e) => {
+      let isActive = toggleDataActiveButton(e); // TODO: add friction here as well ,lets be an annoying prick
+      // let interval = Number(e.target.getAttribute("data-time"));
+      let interval = 1;
+      let until = new Date();
+      until.setMinutes(until.getMinutes() + interval);
+      if (isActive) {
+        let sure = prompt(
+          "Are you sure you want to go in there? \n Write I AM SURE THAT WILL BE A GOOD CHOICE"
+        );
+        if (sure === "I AM SURE THAT WILL BE A GOOD CHOICE") {
+          chrome.runtime.sendMessage({ message: "let-in", until: until });
+        }
+      }
+    });
+  });
+}

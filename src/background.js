@@ -41,19 +41,53 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.runtime.onMessage.addListener(function (request, sender) {
   if (request.message === "blocked-page-opened") {
     let redirectURL = chrome.runtime.getURL("blocked-page.html");
-    chrome.storage.sync.get(["customRedirect"], (res) => {
+    chrome.storage.sync.get(["customRedirect", "bypassUntil"], (res) => {
       if (res.customRedirect) {
         redirectURL = res.customRedirect;
       }
-      chrome.tabs.update(sender.tab.id, {
-        url: redirectURL,
-      });
-      console.log("blocked", sender.tab.url);
+
+      let until = new Date(res.bypassUntil);
+      if (new Date() > until) {
+        chrome.tabs.update(sender.tab.id, {
+          url: redirectURL,
+        });
+        chrome.storage.sync.set({
+          lastBlocked: {
+            tabId: sender.tab.id,
+            url: sender.tab.url,
+          },
+        });
+        console.log("blocked", sender.tab.url);
+      } else {
+        console.log("not blocking it until", until);
+      }
+    });
+  }
+
+  if (request.message === "let-in") {
+    // open the gates
+    chrome.storage.sync.set({ bypassUntil: request.until });
+
+    chrome.storage.sync.get(["lastBlocked"], (res) => {
+      if (res.lastBlocked.tabId === sender.tab.id) {
+        setTimeout(() => {
+          // console.log("will redirect you in 2 seconds");
+          chrome.tabs.update(sender.tab.id, {
+            url: res.lastBlocked.url,
+          });
+        }, 1000);
+      }
     });
   }
 });
 
 // TODO:
-// [x] integrate js state with store
-// [x] custom redirect stuff
 // [] handle bypass mechanism
+/*
+get the bypass time and interval for shutdown
+
+use prompts, make sure it is going to break the auto behaviors.
+
+
+
+*/

@@ -93,6 +93,20 @@
         </button>
       </div>
 
+      <div class="mt-8 flex flex-col items-center">
+        <button id="bypass-button" class="mb-3" data-active="false">
+          Just let me in
+        </button>
+        <div class="grid hidden grid-cols-3 gap-2" id="bypass-options">
+          <button data-active="false" data-time="1">1 min</button>
+          <button data-active="false" data-time="5">5 min</button>
+          <button data-active="false" data-time="15">15 min</button>
+          <button data-active="false" data-time="30">30 min</button>
+          <button data-active="false" data-time="60">1 hour</button>
+          <button data-active="false" data-time="120">2 hours</button>
+        </div>
+      </div>
+
       <div class="settings-container hidden">
         <button class="back-button" title="Go Back -> [ ">
           <span class="back-arrow"></span>
