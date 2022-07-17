@@ -1,6 +1,6 @@
 chrome.runtime.onInstalled.addListener(async () => {
   // interesting idea is to shoot them into the login page of a web app and handle all logic and data there instead of chrome apis
-  let url = chrome.runtime.getURL("hello.html");
+  let url = "https://yusufhilmi.com/site-blocker";
   let tab = await chrome.tabs.create({ url });
   console.log(`Created tab ${tab.id}`);
 
