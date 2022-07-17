@@ -447,11 +447,21 @@ options.forEach((option) => {
     let until = new Date();
     until.setMinutes(until.getMinutes() + interval);
     if (isActive) {
+      const passInput = "I AM SURE THAT WILL BE A GOOD CHOICE";
       let sure = prompt(
-        "Are you sure you want to go in there? \n Write I AM SURE THAT WILL BE A GOOD CHOICE"
+        `Are you sure you want to go in there? \n\n If so, write: ${passInput}`
       );
-      if (sure === "I AM SURE THAT WILL BE A GOOD CHOICE") {
+      if (sure === passInput) {
         chrome.runtime.sendMessage({ message: "let-in", until: until });
+      } else {
+        let definitelySure = prompt(
+          `You must've made a typo, please try again and make sure you absolutely wanna go in there.\n\n\n  Write: ${passInput}`
+        );
+        if (definitelySure === passInput) {
+          chrome.runtime.sendMessage({ message: "let-in", until: until });
+        } else {
+          toggleDataActiveButton(e);
+        }
       }
     }
   });
