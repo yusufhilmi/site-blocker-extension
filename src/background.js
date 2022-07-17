@@ -87,14 +87,3 @@ chrome.runtime.onMessage.addListener(function (request, sender) {
     });
   }
 });
-
-// TODO:
-// [x] handle bypass mechanism
-/*
-get the bypass time and interval for shutdown
-
-use prompts, make sure it is going to break the auto behaviors.
-
-
-
-*/
