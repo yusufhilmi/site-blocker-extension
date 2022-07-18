@@ -100,7 +100,7 @@ const addDomain = (domain, isNew = false) => {
     isNew ? "data-placeholder='" + newHost + "'" : ""
   }>${
     isNew ? "" : domain.host
-  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-150"><img src="./trash-can.svg"/></button>
+  }</span><button class="delete w-6 h-6 outline-none p-1 rounded hover:bg-hab-300 focus-visible:bg-hab-300 dark:hover:bg-hab-600/50 dark:focus-visible:bg-hab-600/50 focus-visible:scale-110 hover:scale-110 transition ease-in-out duration-150"><img src="./icons/trash-can.svg"/></button>
 `;
   domainsList.append(domainListItem);
 
