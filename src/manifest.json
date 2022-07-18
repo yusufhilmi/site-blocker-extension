@@ -24,10 +24,10 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "nemria.png",
-      "32": "nemria.png",
-      "48": "nemria.png",
-      "128": "nemria.png"
+      "16": "/icons/icon.png",
+      "32": "/icons/icon@2x.png",
+      "48": "/icons/icon@3x.png",
+      "128": "/icons/icon@8x.png"
     }
   }
 }
