@@ -1,6 +1,6 @@
 {
   "name": "Focus! Site Blocker with todos",
-  "description": "A friction-full site blocker with todo list. Blocks the sites that distracts you, breaks your auto behaviours for dopamine search, lets you focus on your todos instead.",
+  "description": "A friction-full site blocker with todo list.",
   "version": "0.0.1",
   "manifest_version": 3,
   "background": {
